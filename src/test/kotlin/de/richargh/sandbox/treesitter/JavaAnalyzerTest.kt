@@ -346,6 +346,103 @@ class JavaAnalyzerTest {
     }
 
     @Nested
+    inner class FindClassFunctionInvocations {
+
+        @Test
+        fun shouldFindFunctionStaticListInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+                void doSth(){
+                    var names = List.of("aName");
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("List.of")
+        }
+
+        @Test
+        fun shouldFindFunctionStaticInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            import static java.util.List.*;
+            
+            public class MyClass {
+            
+                void doSth(){
+                    var names = of("aName");
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("of")
+        }
+
+        @Test
+        fun shouldFindFunctionObjectFunctionInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+            
+                void doSth(){
+                    public int number = Singleton.number();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("Singleton.number")
+        }
+
+        @Test
+        fun shouldFindFunctionConstructorInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+                
+                void doSth(){
+                    Other number = new Other();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("Other")
+        }
+    }
+
+    @Nested
     inner class FindRecords {
         @Test
         fun shouldFindRecord() {
