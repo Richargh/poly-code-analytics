@@ -9,15 +9,23 @@ class JavaAnalyzer {
     private val parser = TSParser()
     private val java: TSLanguage = TreeSitterJava()
 
-    fun analyze(javaCode: String){
-        val javaCodeLines = javaCode.lines()
+    init {
         parser.setLanguage(java)
+    }
+
+    fun analyze(javaCode: String): Context {
+        val javaCodeLines = javaCode.lines()
         val tree = parser.parseString(null, javaCode)
         val rootNode = tree.rootNode
 
-        printNode(rootNode, "")
         val fileContext = FileContext(javaCodeLines)
         traverseNode(rootNode, fileContext)
-        println(fileContext.format(0))
+        return fileContext
+    }
+
+    fun printTree(javaCode: String){
+        val tree = parser.parseString(null, javaCode)
+        val rootNode = tree.rootNode
+        printNode(rootNode, "")
     }
 }

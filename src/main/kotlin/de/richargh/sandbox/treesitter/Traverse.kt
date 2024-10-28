@@ -2,7 +2,7 @@ package de.richargh.sandbox.treesitter
 
 import org.treesitter.TSNode
 
-fun traverseNode(node: TSNode, context: Context) {
+fun traverseNode(node: TSNode, context: MutableContext) {
     var childrenToExplore = 0 until node.childCount
     var currentContext = context
     when (node.type) {
@@ -36,7 +36,7 @@ fun traverseNode(node: TSNode, context: Context) {
     }
 }
 
-private fun handleClassDeclaration(node: TSNode, context: Context): Pair<Context, Int> {
+private fun handleClassDeclaration(node: TSNode, context: MutableContext): Pair<MutableContext, Int> {
     var bodyIndex = 0
     var modifier = "default"
     var identifier = "none"
@@ -55,7 +55,7 @@ private fun handleClassDeclaration(node: TSNode, context: Context): Pair<Context
     )
 }
 
-private fun handleFieldDeclaration(node: TSNode, context: Context) {
+private fun handleFieldDeclaration(node: TSNode, context: MutableContext) {
     var modifier = "default"
     var typeIdentifier = "none"
     var identifier = "none"
@@ -71,7 +71,7 @@ private fun handleFieldDeclaration(node: TSNode, context: Context) {
     context.addField(modifier, identifier, typeIdentifier)
 }
 
-private fun handleMethodInvocation(node: TSNode, context: Context) {
+private fun handleMethodInvocation(node: TSNode, context: MutableContext) {
     var fieldAccess = ""
     var identifier = ""
     var argumentList = ""
@@ -87,7 +87,7 @@ private fun handleMethodInvocation(node: TSNode, context: Context) {
     context.addMethodInvocation(fieldAccess, identifier, argumentList)
 }
 
-private fun handleMethodDeclaration(node: TSNode, context: Context): Context {
+private fun handleMethodDeclaration(node: TSNode, context: MutableContext): MutableContext {
     var modifiers = ""
     var returnType = ""
     var identifier = ""
