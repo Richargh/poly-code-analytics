@@ -7,6 +7,8 @@ import strikt.assertions.*
 
 class JavaAnalyzerTest {
 
+    private val debugTree = false
+
     @Nested
     inner class Imports {
 
@@ -27,9 +29,11 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allImports()).containsExactly(Import("import java.util.*;"))
-//        println(result.format(0))
-//        testee.printTree(javaCode)
         }
 
     }
@@ -52,9 +56,11 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass")
-//        println(result.format(0))
-//        testee.printTree(javaCode)
         }
 
         @Test
@@ -76,9 +82,11 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass", "Second", "Third")
-//        println(result.format(0))
-//        testee.printTree(javaCode)
         }
 
 
@@ -97,9 +105,11 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allClasses().map { it.identifier }).containsExactly("Util")
-//        println(result.format(0))
-//        testee.printTree(javaCode)
         }
     }
 
@@ -121,8 +131,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
         }
 
@@ -144,8 +156,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
         }
     }
@@ -170,8 +184,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("noop")
         }
 
@@ -190,8 +206,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
         }
 
@@ -210,8 +228,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
         }
 
@@ -230,8 +250,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
         }
 
@@ -251,8 +273,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
         }
 
@@ -277,8 +301,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(
                 FunctionInvocation(
                     "",
@@ -305,8 +331,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
         }
 
@@ -325,8 +353,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(
                 FunctionInvocation(
                     "",
@@ -351,8 +381,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
         }
     }
@@ -377,8 +409,181 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("List", "of"),
+                    """("aName")"""
+                )
+            )
+        }
+
+        @Test
+        fun shouldFindFunctionStaticInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+                
+            import static java.util.List.*;
+            
+            public class MyClass {
+            
+                void doSth(){
+                    var names = of("aName");
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
+        }
+
+        @Test
+        fun shouldFindFunctionObjectFunctionInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+            
+                void doSth(){
+                    public int number = Singleton.number();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("Singleton", "number"),
+                    "()"
+                )
+            )
+        }
+
+        @Test
+        fun shouldFindFunctionConstructorInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+                
+            public class MyClass {
+                
+                void doSth(){
+                    Other number = new Other();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
+        }
+    }
+
+    @Nested
+    inner class FindRecords {
+        @Test
+        fun shouldFindRecord() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public record MyRecord(String name) {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord")
+        }
+
+        @Test
+        fun shouldFindSiblingRecord() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public record MyRecord(String name) {
+                
+            }
+            
+            public record Second(int age) {
+                
+            }
+            
+            public record Third(long millis) { }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord", "Second", "Third")
+        }
+    }
+
+
+    @Nested
+    inner class FindRecordFunctionInvocations {
+
+        @Test
+        fun shouldFindFunctionStaticListInvocation() {
+            // given
+            val javaCode = """
+            package sample;    
+            
+            public record MyRecord() {
+                void doSth(){
+                    var names = List.of("aName");
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(
                 FunctionInvocation(
                     "",
@@ -396,7 +601,7 @@ class JavaAnalyzerTest {
             
             import static java.util.List.*;
             
-            public class MyClass {
+            public record MyRecord() {
             
                 void doSth(){
                     var names = of("aName");
@@ -408,8 +613,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
         }
 
@@ -417,9 +624,7 @@ class JavaAnalyzerTest {
         fun shouldFindFunctionObjectFunctionInvocation() {
             // given
             val javaCode = """
-            package sample;
-            
-            public class MyClass {
+            public record MyRecord() {
             
                 void doSth(){
                     public int number = Singleton.number();
@@ -431,8 +636,10 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(
                 FunctionInvocation(
                     "",
@@ -448,153 +655,6 @@ class JavaAnalyzerTest {
             val javaCode = """
             package sample;
             
-            public class MyClass {
-                
-                void doSth(){
-                    Other number = new Other();
-                }
-            }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
-        }
-    }
-
-    @Nested
-    inner class FindRecords {
-        @Test
-        fun shouldFindRecord() {
-            // given
-            val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
-            
-            public record MyRecord(String name) {
-                
-            }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord")
-        }
-
-        @Test
-        fun shouldFindSiblingRecord() {
-            // given
-            val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
-            
-            public record MyRecord(String name) {
-                
-            }
-            
-            public record Second(int age) {
-                
-            }
-            
-            public record Third(long millis) { }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord", "Second", "Third")
-        }
-    }
-
-
-    @Nested
-    inner class FindRecordFunctionInvocations {
-
-        @Test
-        fun shouldFindFunctionStaticListInvocation() {
-            // given
-            val javaCode = """
-            package sample;
-            
-            public record MyRecord() {
-                void doSth(){
-                    var names = List.of("aName");
-                }
-            }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("List", "of"), """("aName")"""))
-        }
-
-        @Test
-        fun shouldFindFunctionStaticInvocation() {
-            // given
-            val javaCode = """
-            package sample;
-            
-            import static java.util.List.*;
-            
-            public record MyRecord() {
-            
-                void doSth(){
-                    var names = of("aName");
-                }
-            }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
-        }
-
-        @Test
-        fun shouldFindFunctionObjectFunctionInvocation() {
-            // given
-            val javaCode = """
-            package sample;
-            
-            public record MyRecord() {
-            
-                void doSth(){
-                    public int number = Singleton.number();
-                }
-            }
-        """
-            val testee = JavaAnalyzer()
-            // when
-            val result = testee.analyze(javaCode)
-
-            // then
-            println(result.format(0))
-            testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("Singleton", "number"), "()"))
-        }
-
-        @Test
-        fun shouldFindFunctionConstructorInvocation() {
-            // given
-            val javaCode = """
-            package sample;
-            
             public record MyRecord() {
                 
                 void doSth(){
@@ -607,11 +667,12 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            println(result.format(0))
-            testee.printTree(javaCode)
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
             expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
         }
     }
-
 
 }
