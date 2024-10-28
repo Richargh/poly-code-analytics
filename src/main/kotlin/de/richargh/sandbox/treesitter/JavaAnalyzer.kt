@@ -18,9 +18,9 @@ class JavaAnalyzer {
         val tree = parser.parseString(null, javaCode)
         val rootNode = tree.rootNode
 
-        val fileContext = FileContext(javaCodeLines)
-        traverseNode(rootNode, fileContext)
-        return fileContext
+        val fileCluster = FileCluster(javaCodeLines)
+        traverseNode(rootNode, fileCluster)
+        return fileCluster
     }
 
     fun printTree(javaCode: String){

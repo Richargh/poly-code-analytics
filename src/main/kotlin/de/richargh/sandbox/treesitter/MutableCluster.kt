@@ -4,16 +4,16 @@ import org.treesitter.TSNode
 
 interface MutableCluster : Cluster {
     val previous: MutableCluster?
-    fun addContext(context: MutableCluster): MutableCluster
+    fun addCluster(cluster: MutableCluster): MutableCluster
     fun addImport(node: TSNode)
     fun addField(field: Field)
     fun addFunctionInvocation(functionInvocation: FunctionInvocation)
     fun addObjectCreation(objectCreation: ObjectCreation)
 
-    fun builder(): ContextBuilder
+    fun builder(): ClusterBuilder
 }
 
-abstract class BaseContext(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
+abstract class BaseCluster(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
     private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<Import> = mutableListOf()
     private val fields: MutableList<Field> = mutableListOf()
@@ -23,29 +23,29 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return imports
     }
 
-    override fun allClasses(): List<ClassContext> {
-        return children.filterIsInstance<ClassContext>()
+    override fun allClasses(): List<ClassCluster> {
+        return children.filterIsInstance<ClassCluster>()
     }
 
-    override fun allRecords(): List<RecordContext> {
-        return children.filterIsInstance<RecordContext>()
+    override fun allRecords(): List<RecordCluster> {
+        return children.filterIsInstance<RecordCluster>()
     }
 
     override fun allFields(): List<Field> {
         return fields + children.flatMap { it.allFields() }
     }
 
-    override fun allFunctions(): List<FunctionContext> {
-        return children.filterIsInstance<FunctionContext>() + children.flatMap { it.allFunctions() }
+    override fun allFunctions(): List<FunctionCluster> {
+        return children.filterIsInstance<FunctionCluster>() + children.flatMap { it.allFunctions() }
     }
 
     override fun allInvocations(): List<Invocation> {
         return invocations + children.flatMap { it.allInvocations() }
     }
 
-    override fun addContext(context: MutableCluster): MutableCluster {
-        children.add(context)
-        return context
+    override fun addCluster(cluster: MutableCluster): MutableCluster {
+        children.add(cluster)
+        return cluster
     }
 
     override fun addImport(node: TSNode) {
@@ -97,38 +97,38 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         }
     }
 
-    override fun builder(): ContextBuilder {
-        return BaseContextBuilder(this, codeLines)
+    override fun builder(): ClusterBuilder {
+        return BaseClusterBuilder(this, codeLines)
     }
 }
 
-interface ContextBuilder {
-    fun buildPackageContext(): PackageContext
-    fun buildClassContext(modifier: String, identifier: String): ClassContext
-    fun buildRecordContext(modifier: String, identifier: String, formalParameters: String): RecordContext
-    fun buildFunctionContext(modifiers: String, identifier: String, parameters: String, returnType: String): FunctionContext
+interface ClusterBuilder {
+    fun buildPackageCluster(): PackageCluster
+    fun buildClassCluster(modifier: String, identifier: String): ClassCluster
+    fun buildRecordCluster(modifier: String, identifier: String, formalParameters: String): RecordCluster
+    fun buildFunctionCluster(modifiers: String, identifier: String, parameters: String, returnType: String): FunctionCluster
 }
 
-class BaseContextBuilder(private val previous: MutableCluster, private val codeLines: List<String>) : ContextBuilder {
-    override fun buildPackageContext() = PackageContext(
+class BaseClusterBuilder(private val previous: MutableCluster, private val codeLines: List<String>) : ClusterBuilder {
+    override fun buildPackageCluster() = PackageCluster(
         previous, codeLines
     )
 
-    override fun buildClassContext(modifier: String, identifier: String) = ClassContext(
+    override fun buildClassCluster(modifier: String, identifier: String) = ClassCluster(
         modifier, identifier, previous, codeLines
     )
 
-    override fun buildRecordContext(modifier: String, identifier: String, formalParameters: String) = RecordContext(
+    override fun buildRecordCluster(modifier: String, identifier: String, formalParameters: String) = RecordCluster(
         modifier, identifier, formalParameters, previous, codeLines
     )
 
-    override fun buildFunctionContext(modifiers: String, identifier: String, parameters: String, returnType: String) =
-        FunctionContext(
+    override fun buildFunctionCluster(modifiers: String, identifier: String, parameters: String, returnType: String) =
+        FunctionCluster(
             modifiers, identifier, parameters, returnType, previous, codeLines
         )
 }
 
-class FileContext(codeLines: List<String>) : BaseContext(null, codeLines) {
+class FileCluster(codeLines: List<String>) : BaseCluster(null, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("File")
@@ -136,7 +136,7 @@ class FileContext(codeLines: List<String>) : BaseContext(null, codeLines) {
     }
 }
 
-class PackageContext(previous: MutableCluster, codeLines: List<String>) : BaseContext(previous, codeLines) {
+class PackageCluster(previous: MutableCluster, codeLines: List<String>) : BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("Package")
@@ -144,11 +144,11 @@ class PackageContext(previous: MutableCluster, codeLines: List<String>) : BaseCo
     }
 }
 
-class ClassContext(
+class ClassCluster(
     val modifier: String, val identifier: String,
     previous: MutableCluster, codeLines: List<String>
 ) :
-    BaseContext(previous, codeLines) {
+    BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("$modifier class $identifier ")
@@ -156,11 +156,11 @@ class ClassContext(
     }
 }
 
-class RecordContext(
+class RecordCluster(
     val modifier: String, val identifier: String, val formalParameters: String,
     previous: MutableCluster, codeLines: List<String>
 ) :
-    BaseContext(previous, codeLines) {
+    BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("$modifier record $identifier ")
@@ -168,10 +168,10 @@ class RecordContext(
     }
 }
 
-class FunctionContext(
+class FunctionCluster(
     val modifiers: String, val identifier: String, val parameters: String, val returnType: String,
     previous: MutableCluster, codeLines: List<String>
-) : BaseContext(previous, codeLines) {
+) : BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("$modifiers $identifier $parameters: $returnType")

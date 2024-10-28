@@ -5,10 +5,10 @@ interface Cluster {
     fun format(indent: Int): String
 
     fun allImports(): List<Import>
-    fun allClasses(): List<ClassContext>
-    fun allRecords(): List<RecordContext>
+    fun allClasses(): List<ClassCluster>
+    fun allRecords(): List<RecordCluster>
     fun allFields(): List<Field>
-    fun allFunctions(): List<FunctionContext>
+    fun allFunctions(): List<FunctionCluster>
     fun allInvocations(): List<Invocation>
 }
 
