@@ -101,7 +101,53 @@ class JavaAnalyzerTest {
 //        println(result.format(0))
 //        testee.printTree(javaCode)
         }
+    }
 
+    @Nested
+    inner class FindClassFields {
+
+        @Test
+        fun shouldFindInPlaceInitializedField() {
+            // given
+            val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public class MyClass {
+                private final String myField = "Name";
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFields()).containsExactly("private final myField = \"Name\": String")
+        }
+
+        @Test
+        fun shouldFindConstructorInitializedField() {
+            // given
+            val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public class MyClass {
+                private final String myField;
+                public MyClass(String myField) {
+                    this.myField = fieldName;
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            expectThat(result.allFields()).containsExactly("private final myField: String")
+//        println(result.format(0))
+//        testee.printTree(javaCode)
+        }
     }
 
     @Nested

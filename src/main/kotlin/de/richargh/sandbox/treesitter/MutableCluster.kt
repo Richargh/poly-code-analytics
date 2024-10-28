@@ -30,6 +30,10 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return children.filterIsInstance<RecordContext>()
     }
 
+    override fun allFields(): List<String> {
+        return fields + children.flatMap { it.allFields() }
+    }
+
     override fun addContext(context: MutableCluster): MutableCluster {
         children.add(context)
         return context
