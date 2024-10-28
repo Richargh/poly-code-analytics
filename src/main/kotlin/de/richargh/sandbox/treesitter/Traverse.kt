@@ -109,7 +109,7 @@ private fun handleFieldDeclaration(node: TSNode, context: MutableCluster): Int {
             }
         }
     }
-    context.addField(modifier, identifier, typeIdentifier)
+    context.addField(Field(modifier, identifier, typeIdentifier))
 
     return variableDeclaratorIndex
 }

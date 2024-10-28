@@ -6,7 +6,7 @@ interface MutableCluster : Cluster {
     val previous: MutableCluster?
     fun addContext(context: MutableCluster): MutableCluster
     fun addImport(node: TSNode)
-    fun addField(modifier: String, identifier: String, typeIdentifier: String)
+    fun addField(field: Field)
     fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String)
     fun addObjectCreation(typeIdentifier: String, argumentList: String)
 
@@ -16,7 +16,7 @@ interface MutableCluster : Cluster {
 abstract class BaseContext(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
     private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<Import> = mutableListOf()
-    private val fields: MutableList<String> = mutableListOf()
+    private val fields: MutableList<Field> = mutableListOf()
     private val invocations: MutableList<String> = mutableListOf()
 
     override fun allImports(): List<Import> {
@@ -31,7 +31,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return children.filterIsInstance<RecordContext>()
     }
 
-    override fun allFields(): List<String> {
+    override fun allFields(): List<Field> {
         return fields + children.flatMap { it.allFields() }
     }
 
@@ -53,8 +53,8 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         imports.add(Import(importPath))
     }
 
-    override fun addField(modifier: String, identifier: String, typeIdentifier: String) {
-        fields.add("$modifier $identifier: $typeIdentifier")
+    override fun addField(field: Field) {
+        fields.add(field)
     }
 
     override fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String) {

@@ -123,7 +123,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allFields()).containsExactly("private final myField: String")
+            expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
         }
 
         @Test
@@ -146,7 +146,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allFields()).containsExactly("private final myField: String")
+            expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
         }
     }
 

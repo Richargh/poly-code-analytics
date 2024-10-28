@@ -7,9 +7,11 @@ interface Cluster {
     fun allImports(): List<Import>
     fun allClasses(): List<ClassContext>
     fun allRecords(): List<RecordContext>
-    fun allFields(): List<String>
+    fun allFields(): List<Field>
     fun allFunctions(): List<FunctionContext>
     fun allInvocations(): List<String>
 }
 
 data class Import(val path: String)
+
+data class Field(val modifier: String, val identifier: String, val typeIdentifier: String)
