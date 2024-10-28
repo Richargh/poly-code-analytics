@@ -260,10 +260,10 @@ class JavaAnalyzerTest {
 
 
     @Nested
-    inner class FindClassInvocations {
+    inner class FindClassFieldInvocations {
 
         @Test
-        fun shouldFindStaticListInvocation() {
+        fun shouldFindFieldStaticListInvocation() {
             // given
             val javaCode = """
             package sample;
@@ -283,7 +283,7 @@ class JavaAnalyzerTest {
         }
 
         @Test
-        fun shouldFindStaticInvocation() {
+        fun shouldFindFieldStaticInvocation() {
             // given
             val javaCode = """
             package sample;
@@ -305,7 +305,7 @@ class JavaAnalyzerTest {
         }
 
         @Test
-        fun shouldFindObjectFunctionInvocation() {
+        fun shouldFindFieldObjectFunctionInvocation() {
             // given
             val javaCode = """
             package sample;
