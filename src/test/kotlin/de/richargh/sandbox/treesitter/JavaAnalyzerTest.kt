@@ -303,6 +303,26 @@ class JavaAnalyzerTest {
             testee.printTree(javaCode)
             expectThat(result.allInvocations()).containsExactly("of")
         }
+
+        @Test
+        fun shouldFindObjectFunctionInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+                public int number = Singleton.number();
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("Singleton.number")
+        }
     }
 
     @Nested
