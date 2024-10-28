@@ -1,48 +1,25 @@
 package de.richargh.sandbox.treesitter
 
-import org.treesitter.TSLanguage
-import org.treesitter.TSNode
-import org.treesitter.TSParser
-import org.treesitter.TreeSitterJava
+import java.nio.file.Files
+import kotlin.io.path.Path
+import kotlin.io.path.readText
 
 
-private const val javaCode = """
-    import de.richargh.Bla;
-    import de.richargh.Blubb;
-    
-    public class FooService {
-        private final Outside outside;
-        public FooService(){
-            this.outside = new Outside();
-        }
-        
-        public int act(){
-            this.outside.noop();
-            return 42;
-        }
+fun main(args: Array<String>) {
+    if(args.size != 1) {
+        println("Please pass in the FILE to analyze as first argument")
+        return
     }
-    
-    class Outside {
-        public void noop(){
-            // do nothing
-        }
+    val path = Path(args[0])
+    if(Files.notExists(path)){
+        println("File [$path] does not exist")
+        return
     }
-    """
 
-fun main() {
-    val javaCodeLines = javaCode.lines()
-    val parser = TSParser()
-    val java: TSLanguage = TreeSitterJava()
+    if(!Files.isRegularFile(path)){
+        println("File [$path] is not a regular file")
+        return
+    }
 
-    parser.setLanguage(java)
-    val tree = parser.parseString(null, javaCode)
-    val rootNode = tree.rootNode
-    val importNode = rootNode.getChild(0)
-    val importStatement = contents(importNode, javaCodeLines)
-
-    println(tree.rootNode)
-    println(tree.rootNode.getChild(0))
-    println(tree.rootNode.getChild(0).type)
-    println("-------------------------")
-    println(importStatement)
+    JavaAnalyzer().analyze(path.readText())
 }

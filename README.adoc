@@ -17,7 +17,7 @@ Extracts analytical data from source code files without having to compile them.
 
 == Usage
 
-* `./gradlew run` to run simple example
+* `./gradlew run <FILE>` to run analytics
 
 == Acknowledgements
 

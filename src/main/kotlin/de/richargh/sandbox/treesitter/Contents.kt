@@ -19,3 +19,11 @@ fun contents(node: TSNode, codeLines: List<String>): String {
         return result
     }
 }
+
+fun printNode(node: TSNode, indent: String) {
+    println("$indent${node.type} [${node.startPoint.row}, ${node.startPoint.column}] - [${node.endPoint.row}, ${node.endPoint.column}]")
+
+    (0 until node.childCount).forEach { index ->
+        printNode(node.getChild(index), "  $indent")
+    }
+}
