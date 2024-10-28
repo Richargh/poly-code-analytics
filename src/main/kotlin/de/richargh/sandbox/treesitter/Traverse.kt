@@ -28,12 +28,12 @@ fun traverseNode(node: TSNode, context: MutableCluster) {
             childrenToExplore = variableDeclaratorIndex until node.childCount
         }
 
-        "method_invocation" -> {
-            handleMethodInvocation(node, context)
-        }
-
         "method_declaration" -> {
             handleMethodDeclaration(node, context)
+        }
+
+        "method_invocation" -> {
+            handleMethodInvocation(node, context)
         }
     }
 
