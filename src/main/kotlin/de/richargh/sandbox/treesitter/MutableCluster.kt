@@ -8,6 +8,7 @@ interface MutableCluster : Cluster {
     fun addImport(node: TSNode)
     fun addField(modifier: String, identifier: String, typeIdentifier: String)
     fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String)
+    fun addObjectCreation(typeIdentifier: String, argumentList: String)
 
     fun builder(): ContextBuilder
 }
@@ -16,7 +17,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
     private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<String> = mutableListOf()
     private val fields: MutableList<String> = mutableListOf()
-    private val invokedMethods: MutableList<String> = mutableListOf()
+    private val invocations: MutableList<String> = mutableListOf()
 
     override fun allImports(): List<String> {
         return imports
@@ -39,7 +40,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
     }
 
     override fun allInvocations(): List<String> {
-        return invokedMethods + children.flatMap { it.allInvocations() }
+        return invocations + children.flatMap { it.allInvocations() }
     }
 
     override fun addContext(context: MutableCluster): MutableCluster {
@@ -57,7 +58,11 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
     }
 
     override fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String) {
-        invokedMethods.add("$fieldAccess$identifier")
+        invocations.add("$fieldAccess$identifier")
+    }
+
+    override fun addObjectCreation(typeIdentifier: String, argumentList: String) {
+        invocations.add(typeIdentifier)
     }
 
     abstract fun formatHeader(): String
@@ -79,10 +84,10 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
                 appendLine(fields.joinToString("\n$subIndent"))
             }
 
-            if (invokedMethods.isNotEmpty()) {
+            if (invocations.isNotEmpty()) {
                 append(subIndent)
                 append("Invoke: ")
-                appendLine(invokedMethods.joinToString("\n${subIndent}Invoke: "))
+                appendLine(invocations.joinToString("\n${subIndent}Invoke: "))
             }
 
             if (children.isNotEmpty()) {

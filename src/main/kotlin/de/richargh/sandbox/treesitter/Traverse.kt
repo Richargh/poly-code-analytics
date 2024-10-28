@@ -35,6 +35,10 @@ fun traverseNode(node: TSNode, context: MutableCluster) {
         "method_invocation" -> {
             handleMethodInvocation(node, context)
         }
+
+        "object_creation_expression" -> {
+            handleObjectCreationExpression(node, context)
+        }
     }
 
     childrenToExplore.forEach { index ->
@@ -124,6 +128,20 @@ private fun handleMethodInvocation(node: TSNode, context: MutableCluster) {
     }
 
     context.addMethodInvocation(fieldAccess, identifier.joinToString("."), argumentList)
+}
+
+private fun handleObjectCreationExpression(node: TSNode, context: MutableCluster) {
+    var typeIdentifier = ""
+    var argumentList = ""
+    (0 until node.childCount).forEach { index ->
+        val currentNode = node.getChild(index)
+        when (currentNode.type) {
+            "type_identifier" -> typeIdentifier = contents(currentNode, context.codeLines)
+            "argument_list" -> argumentList = contents(currentNode, context.codeLines)
+        }
+    }
+
+    context.addObjectCreation(typeIdentifier, argumentList)
 }
 
 private fun handleMethodDeclaration(node: TSNode, context: MutableCluster): MutableCluster {
