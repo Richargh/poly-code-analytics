@@ -16,7 +16,7 @@ class JavaAnalyzerTest {
         fun shouldFindImport() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             import java.util.*;
             
@@ -45,7 +45,7 @@ class JavaAnalyzerTest {
         fun shouldFindClass() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public class MyClass {
                 
@@ -67,7 +67,7 @@ class JavaAnalyzerTest {
         fun shouldFindSiblingClasses() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public class MyClass {
                 
@@ -94,7 +94,7 @@ class JavaAnalyzerTest {
         fun shouldFindStaticClass() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public static class Util {
                 
@@ -120,7 +120,7 @@ class JavaAnalyzerTest {
         fun shouldFindInPlaceInitializedField() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public class MyClass {
                 private final String myField = "Name";
@@ -142,7 +142,7 @@ class JavaAnalyzerTest {
         fun shouldFindConstructorInitializedField() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public class MyClass {
                 private final String myField;
@@ -171,7 +171,7 @@ class JavaAnalyzerTest {
         fun shouldFindReturnVoidFunction() {
             // given
             val javaCode = """
-            package de.richargh.app.polycodeanalytics.sample;
+            package sample;
             
             public class MyClass {
                 public void noop(){
@@ -195,6 +195,8 @@ class JavaAnalyzerTest {
         fun shouldFindReturnPrimitiveFunction() {
             // given
             val javaCode = """
+            package sample;
+                
             public class MyClass {
                 public int doSth(){
                     return 42;
@@ -217,6 +219,8 @@ class JavaAnalyzerTest {
         fun shouldFindReturnListFunction() {
             // given
             val javaCode = """
+            package sample;
+                
             public class MyClass {
                 public List<Int> doSth(){
                     return List.of(42);
@@ -239,6 +243,8 @@ class JavaAnalyzerTest {
         fun shouldFindReturnMapFunction() {
             // given
             val javaCode = """
+            package sample;
+                
             public class MyClass {
                 public Map<Int, String> doSth(){
                     return Map.of(42, "Forty-Two");
@@ -262,6 +268,8 @@ class JavaAnalyzerTest {
         fun shouldFindReturnGenericListFunction() {
             // given
             val javaCode = """
+            package sample;
+                
             public class MyClass {
                 public <T> List<String> doSth(input: List<T>){
                     return input.stream().map(it -> it+"").asList();
