@@ -7,10 +7,13 @@ import strikt.assertions.*
 
 class JavaAnalyzerTest {
 
-    @Test
-    fun shouldFindImport() {
-        // given
-        val javaCode = """
+    @Nested
+    inner class Imports {
+
+        @Test
+        fun shouldFindImport() {
+            // given
+            val javaCode = """
             package de.richargh.app.polycodeanalytics.sample;
             
             import java.util.*;
@@ -19,14 +22,16 @@ class JavaAnalyzerTest {
                 
             }
         """
-        val testee = JavaAnalyzer()
-        // when
-        val result = testee.analyze(javaCode)
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
 
-        // then
-        expectThat(result.allImports()).containsExactly("import java.util.*;")
+            // then
+            expectThat(result.allImports()).containsExactly("import java.util.*;")
 //        println(result.format(0))
 //        testee.printTree(javaCode)
+        }
+
     }
 
     @Test
@@ -48,8 +53,6 @@ class JavaAnalyzerTest {
 //        println(result.format(0))
 //        testee.printTree(javaCode)
     }
-
-
 
     @Test
     fun shouldFindSiblingClasses() {
