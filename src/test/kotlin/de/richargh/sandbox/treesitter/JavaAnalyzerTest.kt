@@ -27,7 +27,7 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-            expectThat(result.allImports()).containsExactly("import java.util.*;")
+            expectThat(result.allImports()).containsExactly(Import("import java.util.*;"))
 //        println(result.format(0))
 //        testee.printTree(javaCode)
         }

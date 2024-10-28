@@ -15,11 +15,11 @@ interface MutableCluster : Cluster {
 
 abstract class BaseContext(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
     private val children: MutableList<MutableCluster> = mutableListOf()
-    private val imports: MutableList<String> = mutableListOf()
+    private val imports: MutableList<Import> = mutableListOf()
     private val fields: MutableList<String> = mutableListOf()
     private val invocations: MutableList<String> = mutableListOf()
 
-    override fun allImports(): List<String> {
+    override fun allImports(): List<Import> {
         return imports
     }
 
@@ -50,7 +50,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
 
     override fun addImport(node: TSNode) {
         val importPath = contents(node, codeLines)
-        imports.add(importPath)
+        imports.add(Import(importPath))
     }
 
     override fun addField(modifier: String, identifier: String, typeIdentifier: String) {
