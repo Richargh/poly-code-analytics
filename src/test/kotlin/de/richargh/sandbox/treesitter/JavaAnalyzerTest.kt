@@ -1,5 +1,6 @@
 package de.richargh.sandbox.treesitter
 
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import strikt.api.*
 import strikt.assertions.*
@@ -70,6 +71,27 @@ class JavaAnalyzerTest {
 
         // then
         expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass", "Second", "Third")
+//        println(result.format(0))
+//        testee.printTree(javaCode)
+    }
+
+
+    @Test
+    fun shouldFindStaticClass() {
+        // given
+        val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public static class Util {
+                
+            }
+        """
+        val testee = JavaAnalyzer()
+        // when
+        val result = testee.analyze(javaCode)
+
+        // then
+        expectThat(result.allClasses().map { it.identifier }).containsExactly("Util")
 //        println(result.format(0))
 //        testee.printTree(javaCode)
     }
