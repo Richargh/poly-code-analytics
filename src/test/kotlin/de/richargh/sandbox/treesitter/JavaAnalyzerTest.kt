@@ -33,31 +33,34 @@ class JavaAnalyzerTest {
         }
 
     }
+    
+    @Nested
+    inner class FindClasses {
 
-    @Test
-    fun shouldFindClass() {
-        // given
-        val javaCode = """
+        @Test
+        fun shouldFindClass() {
+            // given
+            val javaCode = """
             package de.richargh.app.polycodeanalytics.sample;
             
             public class MyClass {
                 
             }
         """
-        val testee = JavaAnalyzer()
-        // when
-        val result = testee.analyze(javaCode)
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
 
-        // then
-        expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass")
+            // then
+            expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass")
 //        println(result.format(0))
 //        testee.printTree(javaCode)
-    }
+        }
 
-    @Test
-    fun shouldFindSiblingClasses() {
-        // given
-        val javaCode = """
+        @Test
+        fun shouldFindSiblingClasses() {
+            // given
+            val javaCode = """
             package de.richargh.app.polycodeanalytics.sample;
             
             public class MyClass {
@@ -68,35 +71,37 @@ class JavaAnalyzerTest {
             
             class Third {}
         """
-        val testee = JavaAnalyzer()
-        // when
-        val result = testee.analyze(javaCode)
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
 
-        // then
-        expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass", "Second", "Third")
+            // then
+            expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass", "Second", "Third")
 //        println(result.format(0))
 //        testee.printTree(javaCode)
-    }
+        }
 
 
-    @Test
-    fun shouldFindStaticClass() {
-        // given
-        val javaCode = """
+        @Test
+        fun shouldFindStaticClass() {
+            // given
+            val javaCode = """
             package de.richargh.app.polycodeanalytics.sample;
             
             public static class Util {
                 
             }
         """
-        val testee = JavaAnalyzer()
-        // when
-        val result = testee.analyze(javaCode)
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
 
-        // then
-        expectThat(result.allClasses().map { it.identifier }).containsExactly("Util")
+            // then
+            expectThat(result.allClasses().map { it.identifier }).containsExactly("Util")
 //        println(result.format(0))
 //        testee.printTree(javaCode)
+        }
+
     }
 
 }
