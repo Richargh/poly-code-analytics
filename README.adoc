@@ -1,0 +1,24 @@
+= Polyglot Source Code Analytics
+
+Extracts analytical data from source code files without having to compile them.
+
+== Features
+
+* Metrics for multiple languages (in progress)
+
+== Tech
+
+* link:https://tree-sitter.github.io/tree-sitter/[Tree-Sitter]
+* link:https://github.com/bonede/tree-sitter-ng[Next generation Tree Sitter Java bindings]
+
+== Preconditions
+
+* Install the java version from link:.sdkmanrc[] via link:https://sdkman.io/[SdkMan] by calling `sdk env`
+
+== Usage
+
+* `./gradlew run` to run simple example
+
+== Acknowledgements
+
+* Based on my link:https://github.com/Richargh/tree-sitter-parser-kt-kdrl-sandbox[tree-sitter sandbox]
