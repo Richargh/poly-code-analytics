@@ -13,7 +13,7 @@ class JavaAnalyzer {
         parser.setLanguage(java)
     }
 
-    fun analyze(javaCode: String): Context {
+    fun analyze(javaCode: String): Cluster {
         val javaCodeLines = javaCode.lines()
         val tree = parser.parseString(null, javaCode)
         val rootNode = tree.rootNode

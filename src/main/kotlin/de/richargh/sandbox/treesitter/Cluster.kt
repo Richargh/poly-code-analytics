@@ -2,7 +2,7 @@ package de.richargh.sandbox.treesitter
 
 import org.treesitter.TSNode
 
-interface Context {
+interface Cluster {
     val codeLines: List<String>
     fun format(indent: Int): String
 
@@ -10,9 +10,9 @@ interface Context {
     fun allClasses(): List<ClassContext>
 }
 
-interface MutableContext : Context {
-    val previous: MutableContext?
-    fun addContext(context: MutableContext): MutableContext
+interface MutableCluster : Cluster {
+    val previous: MutableCluster?
+    fun addContext(context: MutableCluster): MutableCluster
     fun addImport(node: TSNode)
     fun addField(modifier: String, identifier: String, typeIdentifier: String)
     fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String)
@@ -20,8 +20,8 @@ interface MutableContext : Context {
     fun builder(): ContextBuilder
 }
 
-abstract class BaseContext(override val previous: MutableContext?, override val codeLines: List<String>) : MutableContext {
-    private val children: MutableList<MutableContext> = mutableListOf()
+abstract class BaseContext(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
+    private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<String> = mutableListOf()
     private val fields: MutableList<String> = mutableListOf()
     private val invokedMethods: MutableList<String> = mutableListOf()
@@ -34,7 +34,7 @@ abstract class BaseContext(override val previous: MutableContext?, override val 
         return children.filterIsInstance<ClassContext>()
     }
 
-    override fun addContext(context: MutableContext): MutableContext {
+    override fun addContext(context: MutableCluster): MutableCluster {
         children.add(context)
         return context
     }
@@ -95,7 +95,7 @@ interface ContextBuilder {
     fun buildFunctionContext(modifiers: String, identifier: String, parameters: String, returnType: String): FunctionContext
 }
 
-class BaseContextBuilder(private val previous: MutableContext, private val codeLines: List<String>) : ContextBuilder {
+class BaseContextBuilder(private val previous: MutableCluster, private val codeLines: List<String>) : ContextBuilder {
     override fun buildPackageContext() = PackageContext(
         previous, codeLines
     )
@@ -118,7 +118,7 @@ class FileContext(codeLines: List<String>) : BaseContext(null, codeLines) {
     }
 }
 
-class PackageContext(previous: MutableContext, codeLines: List<String>) : BaseContext(previous, codeLines) {
+class PackageContext(previous: MutableCluster, codeLines: List<String>) : BaseContext(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
             appendLine("Package")
@@ -128,7 +128,7 @@ class PackageContext(previous: MutableContext, codeLines: List<String>) : BaseCo
 
 class ClassContext(
     val modifier: String, val identifier: String,
-    previous: MutableContext, codeLines: List<String>
+    previous: MutableCluster, codeLines: List<String>
 ) :
     BaseContext(previous, codeLines) {
     override fun formatHeader(): String {
@@ -140,7 +140,7 @@ class ClassContext(
 
 class FunctionContext(
     val modifiers: String, val identifier: String, val parameters: String, val returnType: String,
-    previous: MutableContext, codeLines: List<String>
+    previous: MutableCluster, codeLines: List<String>
 ) : BaseContext(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
