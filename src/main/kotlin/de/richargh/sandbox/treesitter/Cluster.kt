@@ -9,9 +9,19 @@ interface Cluster {
     fun allRecords(): List<RecordContext>
     fun allFields(): List<Field>
     fun allFunctions(): List<FunctionContext>
-    fun allInvocations(): List<String>
+    fun allInvocations(): List<Invocation>
 }
 
 data class Import(val path: String)
 
 data class Field(val modifier: String, val identifier: String, val typeIdentifier: String)
+
+interface Invocation
+
+data class FunctionInvocation(
+    val fieldAccess: String, val identifiers: List<String>, val arguments: String
+) : Invocation
+
+data class ObjectCreation(
+    val typeIdentifier: String, val arguments: String
+) : Invocation

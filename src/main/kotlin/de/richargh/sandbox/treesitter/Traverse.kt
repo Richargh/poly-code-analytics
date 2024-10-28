@@ -116,18 +116,18 @@ private fun handleFieldDeclaration(node: TSNode, context: MutableCluster): Int {
 
 private fun handleMethodInvocation(node: TSNode, context: MutableCluster) {
     var fieldAccess = ""
-    var identifier = mutableListOf<String>()
+    var identifiers = mutableListOf<String>()
     var argumentList = ""
     (0 until node.childCount).forEach { index ->
         val currentNode = node.getChild(index)
         when (currentNode.type) {
             "field_access" -> fieldAccess = contents(currentNode, context.codeLines)
-            "identifier" -> identifier += contents(currentNode, context.codeLines)
+            "identifier" -> identifiers += contents(currentNode, context.codeLines)
             "argument_list" -> argumentList = contents(currentNode, context.codeLines)
         }
     }
 
-    context.addMethodInvocation(fieldAccess, identifier.joinToString("."), argumentList)
+    context.addFunctionInvocation(FunctionInvocation(fieldAccess, identifiers, argumentList))
 }
 
 private fun handleObjectCreationExpression(node: TSNode, context: MutableCluster) {
@@ -141,7 +141,7 @@ private fun handleObjectCreationExpression(node: TSNode, context: MutableCluster
         }
     }
 
-    context.addObjectCreation(typeIdentifier, argumentList)
+    context.addObjectCreation(ObjectCreation(typeIdentifier, argumentList))
 }
 
 private fun handleMethodDeclaration(node: TSNode, context: MutableCluster): MutableCluster {

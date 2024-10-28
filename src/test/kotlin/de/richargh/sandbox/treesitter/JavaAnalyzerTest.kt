@@ -279,7 +279,13 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("List.of")
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("List", "of"),
+                    """("aName")"""
+                )
+            )
         }
 
         @Test
@@ -301,7 +307,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("of")
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
         }
 
         @Test
@@ -321,7 +327,13 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Singleton.number")
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("Singleton", "number"),
+                    "()"
+                )
+            )
         }
 
         @Test
@@ -341,7 +353,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Other")
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
         }
     }
 
@@ -367,7 +379,13 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("List.of")
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("List", "of"),
+                    """("aName")"""
+                )
+            )
         }
 
         @Test
@@ -392,7 +410,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("of")
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
         }
 
         @Test
@@ -415,7 +433,13 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Singleton.number")
+            expectThat(result.allInvocations()).containsExactly(
+                FunctionInvocation(
+                    "",
+                    listOf("Singleton", "number"),
+                    "()"
+                )
+            )
         }
 
         @Test
@@ -438,7 +462,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Other")
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
         }
     }
 
@@ -514,7 +538,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("List.of")
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("List", "of"), """("aName")"""))
         }
 
         @Test
@@ -539,7 +563,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("of")
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("of"), """("aName")"""))
         }
 
         @Test
@@ -562,7 +586,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Singleton.number")
+            expectThat(result.allInvocations()).containsExactly(FunctionInvocation("", listOf("Singleton", "number"), "()"))
         }
 
         @Test
@@ -585,7 +609,7 @@ class JavaAnalyzerTest {
             // then
             println(result.format(0))
             testee.printTree(javaCode)
-            expectThat(result.allInvocations()).containsExactly("Other")
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
         }
     }
 

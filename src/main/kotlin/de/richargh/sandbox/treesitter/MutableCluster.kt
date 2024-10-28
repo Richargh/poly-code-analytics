@@ -7,8 +7,8 @@ interface MutableCluster : Cluster {
     fun addContext(context: MutableCluster): MutableCluster
     fun addImport(node: TSNode)
     fun addField(field: Field)
-    fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String)
-    fun addObjectCreation(typeIdentifier: String, argumentList: String)
+    fun addFunctionInvocation(functionInvocation: FunctionInvocation)
+    fun addObjectCreation(objectCreation: ObjectCreation)
 
     fun builder(): ContextBuilder
 }
@@ -17,7 +17,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
     private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<Import> = mutableListOf()
     private val fields: MutableList<Field> = mutableListOf()
-    private val invocations: MutableList<String> = mutableListOf()
+    private val invocations: MutableList<Invocation> = mutableListOf()
 
     override fun allImports(): List<Import> {
         return imports
@@ -39,7 +39,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return children.filterIsInstance<FunctionContext>() + children.flatMap { it.allFunctions() }
     }
 
-    override fun allInvocations(): List<String> {
+    override fun allInvocations(): List<Invocation> {
         return invocations + children.flatMap { it.allInvocations() }
     }
 
@@ -57,12 +57,12 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         fields.add(field)
     }
 
-    override fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String) {
-        invocations.add("$fieldAccess$identifier")
+    override fun addFunctionInvocation(functionInvocation: FunctionInvocation) {
+        invocations.add(functionInvocation)
     }
 
-    override fun addObjectCreation(typeIdentifier: String, argumentList: String) {
-        invocations.add(typeIdentifier)
+    override fun addObjectCreation(objectCreation: ObjectCreation) {
+        invocations.add(objectCreation)
     }
 
     abstract fun formatHeader(): String
