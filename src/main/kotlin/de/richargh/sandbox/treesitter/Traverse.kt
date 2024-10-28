@@ -17,6 +17,12 @@ fun traverseNode(node: TSNode, context: MutableCluster) {
             childrenToExplore = classBodyIndex until node.childCount
         }
 
+        "record_declaration" -> {
+            val (nextContext, classBodyIndex) = handleRecordDeclaration(node, context)
+            currentContext = nextContext
+            childrenToExplore = classBodyIndex until node.childCount
+        }
+
         "field_declaration" -> {
             handleFieldDeclaration(node, context)
             childrenToExplore = IntRange.EMPTY
@@ -51,6 +57,27 @@ private fun handleClassDeclaration(node: TSNode, context: MutableCluster): Pair<
 
     return Pair(
         context.addContext(context.builder().buildClassContext(modifier, identifier)),
+        bodyIndex
+    )
+}
+
+private fun handleRecordDeclaration(node: TSNode, context: MutableCluster): Pair<MutableCluster, Int> {
+    var bodyIndex = 0
+    var modifier = "default"
+    var identifier = "none"
+    var formalParameters = ""
+    (0 until node.childCount).forEach { index ->
+        val currentNode = node.getChild(index)
+        when (currentNode.type) {
+            "modifiers" -> modifier = contents(currentNode, context.codeLines)
+            "identifier" -> identifier = contents(currentNode, context.codeLines)
+            "formal_parameters" -> formalParameters = contents(currentNode, context.codeLines)
+            "class_body" -> bodyIndex = index
+        }
+    }
+
+    return Pair(
+        context.addContext(context.builder().buildRecordContext(modifier, identifier, formalParameters)),
         bodyIndex
     )
 }

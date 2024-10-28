@@ -6,4 +6,5 @@ interface Cluster {
 
     fun allImports(): List<String>
     fun allClasses(): List<ClassContext>
+    fun allRecords(): List<RecordContext>
 }

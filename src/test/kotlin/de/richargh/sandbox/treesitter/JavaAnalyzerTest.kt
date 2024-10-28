@@ -33,7 +33,7 @@ class JavaAnalyzerTest {
         }
 
     }
-    
+
     @Nested
     inner class FindClasses {
 
@@ -102,6 +102,55 @@ class JavaAnalyzerTest {
 //        testee.printTree(javaCode)
         }
 
+    }
+
+    @Nested
+    inner class FindRecords {
+        @Test
+        fun shouldFindRecord() {
+            // given
+            val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public record MyRecord(String name) {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord")
+        }
+
+        @Test
+        fun shouldFindSiblingRecord() {
+            // given
+            val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public record MyRecord(String name) {
+                
+            }
+            
+            public record Second(int age) {
+                
+            }
+            
+            public record Third(long millis) { }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allRecords().map { it.identifier }).containsExactly("MyRecord", "Second", "Third")
+        }
     }
 
 }

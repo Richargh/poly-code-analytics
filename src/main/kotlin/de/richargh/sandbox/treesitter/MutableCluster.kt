@@ -26,6 +26,10 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return children.filterIsInstance<ClassContext>()
     }
 
+    override fun allRecords(): List<RecordContext> {
+        return children.filterIsInstance<RecordContext>()
+    }
+
     override fun addContext(context: MutableCluster): MutableCluster {
         children.add(context)
         return context
@@ -84,6 +88,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
 interface ContextBuilder {
     fun buildPackageContext(): PackageContext
     fun buildClassContext(modifier: String, identifier: String): ClassContext
+    fun buildRecordContext(modifier: String, identifier: String, formalParameters: String): RecordContext
     fun buildFunctionContext(modifiers: String, identifier: String, parameters: String, returnType: String): FunctionContext
 }
 
@@ -94,6 +99,10 @@ class BaseContextBuilder(private val previous: MutableCluster, private val codeL
 
     override fun buildClassContext(modifier: String, identifier: String) = ClassContext(
         modifier, identifier, previous, codeLines
+    )
+
+    override fun buildRecordContext(modifier: String, identifier: String, formalParameters: String) = RecordContext(
+        modifier, identifier, formalParameters, previous, codeLines
     )
 
     override fun buildFunctionContext(modifiers: String, identifier: String, parameters: String, returnType: String) =
@@ -126,6 +135,18 @@ class ClassContext(
     override fun formatHeader(): String {
         return buildString {
             appendLine("$modifier class $identifier ")
+        }
+    }
+}
+
+class RecordContext(
+    val modifier: String, val identifier: String, val formalParameters: String,
+    previous: MutableCluster, codeLines: List<String>
+) :
+    BaseContext(previous, codeLines) {
+    override fun formatHeader(): String {
+        return buildString {
+            appendLine("$modifier record $identifier ")
         }
     }
 }
