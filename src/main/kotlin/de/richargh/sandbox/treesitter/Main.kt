@@ -21,5 +21,6 @@ fun main(args: Array<String>) {
         return
     }
 
-    JavaAnalyzer().analyze(path.readText())
+    val result = JavaAnalyzer().analyze(path.readText())
+    println(result.format(0))
 }
