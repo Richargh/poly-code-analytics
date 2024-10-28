@@ -151,6 +151,114 @@ class JavaAnalyzerTest {
     }
 
     @Nested
+    inner class FindClassFunctions {
+
+        @Test
+        fun shouldFindReturnVoidFunction() {
+            // given
+            val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public class MyClass {
+                public void noop(){
+                    // do nothing
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFunctions()).map { it.identifier }.containsExactly("noop")
+        }
+
+        @Test
+        fun shouldFindReturnPrimitiveFunction() {
+            // given
+            val javaCode = """
+            public class MyClass {
+                public int doSth(){
+                    return 42;
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
+        }
+
+        @Test
+        fun shouldFindReturnListFunction() {
+            // given
+            val javaCode = """
+            public class MyClass {
+                public List<Int> doSth(){
+                    return List.of(42);
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
+        }
+
+        @Test
+        fun shouldFindReturnMapFunction() {
+            // given
+            val javaCode = """
+            public class MyClass {
+                public Map<Int, String> doSth(){
+                    return Map.of(42, "Forty-Two");
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
+        }
+
+
+        @Test
+        fun shouldFindReturnGenericListFunction() {
+            // given
+            val javaCode = """
+            public class MyClass {
+                public <T> List<String> doSth(input: List<T>){
+                    return input.stream().map(it -> it+"").asList();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+//            println(result.format(0))
+//            testee.printTree(javaCode)
+            expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
+        }
+
+    }
+
+    @Nested
     inner class FindRecords {
         @Test
         fun shouldFindRecord() {

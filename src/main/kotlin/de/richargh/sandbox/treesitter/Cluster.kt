@@ -8,4 +8,5 @@ interface Cluster {
     fun allClasses(): List<ClassContext>
     fun allRecords(): List<RecordContext>
     fun allFields(): List<String>
+    fun allFunctions(): List<FunctionContext>
 }
