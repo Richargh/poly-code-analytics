@@ -121,9 +121,9 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
-//            println(result.format(0))
-//            testee.printTree(javaCode)
-            expectThat(result.allFields()).containsExactly("private final myField = \"Name\": String")
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allFields()).containsExactly("private final myField: String")
         }
 
         @Test
@@ -144,9 +144,9 @@ class JavaAnalyzerTest {
             val result = testee.analyze(javaCode)
 
             // then
+            println(result.format(0))
+            testee.printTree(javaCode)
             expectThat(result.allFields()).containsExactly("private final myField: String")
-//        println(result.format(0))
-//        testee.printTree(javaCode)
         }
     }
 
@@ -256,6 +256,53 @@ class JavaAnalyzerTest {
             expectThat(result.allFunctions()).map { it.identifier }.containsExactly("doSth")
         }
 
+    }
+
+
+    @Nested
+    inner class FindClassInvocations {
+
+        @Test
+        fun shouldFindStaticListInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public class MyClass {
+                public List<String> names = List.of("aName");
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("List.of")
+        }
+
+        @Test
+        fun shouldFindStaticInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            import static java.util.List.*;
+            
+            public class MyClass {
+                public List<String> names = of("aName");
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            println(result.format(0))
+            testee.printTree(javaCode)
+            expectThat(result.allInvocations()).containsExactly("of")
+        }
     }
 
     @Nested

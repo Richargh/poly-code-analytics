@@ -38,6 +38,10 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
         return children.filterIsInstance<FunctionContext>() + children.flatMap { it.allFunctions() }
     }
 
+    override fun allInvocations(): List<String> {
+        return invokedMethods + children.flatMap { it.allInvocations() }
+    }
+
     override fun addContext(context: MutableCluster): MutableCluster {
         children.add(context)
         return context
@@ -53,7 +57,7 @@ abstract class BaseContext(override val previous: MutableCluster?, override val 
     }
 
     override fun addMethodInvocation(fieldAccess: String, identifier: String, argumentList: String) {
-        invokedMethods.add("$fieldAccess.$identifier$argumentList")
+        invokedMethods.add("$fieldAccess$identifier")
     }
 
     abstract fun formatHeader(): String

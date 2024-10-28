@@ -24,8 +24,8 @@ fun traverseNode(node: TSNode, context: MutableCluster) {
         }
 
         "field_declaration" -> {
-            handleFieldDeclaration(node, context)
-            childrenToExplore = IntRange.EMPTY
+            val variableDeclaratorIndex = handleFieldDeclaration(node, context)
+            childrenToExplore = variableDeclaratorIndex until node.childCount
         }
 
         "method_invocation" -> {
@@ -82,7 +82,8 @@ private fun handleRecordDeclaration(node: TSNode, context: MutableCluster): Pair
     )
 }
 
-private fun handleFieldDeclaration(node: TSNode, context: MutableCluster) {
+private fun handleFieldDeclaration(node: TSNode, context: MutableCluster): Int {
+    var variableDeclaratorIndex = 0
     var modifier = "default"
     var typeIdentifier = "none"
     var identifier = "none"
@@ -91,16 +92,27 @@ private fun handleFieldDeclaration(node: TSNode, context: MutableCluster) {
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, context.codeLines)
             "type_identifier" -> typeIdentifier = contents(currentNode, context.codeLines)
-            "variable_declarator" -> identifier = contents(currentNode, context.codeLines)
+            "generic_type" -> typeIdentifier = contents(currentNode, context.codeLines)
+            "variable_declarator" -> {
+                variableDeclaratorIndex = index
+                (0 until currentNode.childCount).forEach { index ->
+                    val subNode = currentNode.getChild(index)
+                    when(subNode.type){
+                        "identifier" -> identifier = contents(subNode, context.codeLines)
+                    }
+                }
+
+            }
         }
     }
-
     context.addField(modifier, identifier, typeIdentifier)
+
+    return variableDeclaratorIndex
 }
 
 private fun handleMethodInvocation(node: TSNode, context: MutableCluster) {
     var fieldAccess = ""
-    var identifier = ""
+    var identifier = mutableListOf<String>()
     var argumentList = ""
     (0 until node.childCount).forEach { index ->
         val currentNode = node.getChild(index)
@@ -111,7 +123,7 @@ private fun handleMethodInvocation(node: TSNode, context: MutableCluster) {
         }
     }
 
-    context.addMethodInvocation(fieldAccess, identifier, argumentList)
+    context.addMethodInvocation(fieldAccess, identifier.joinToString("."), argumentList)
 }
 
 private fun handleMethodDeclaration(node: TSNode, context: MutableCluster): MutableCluster {
