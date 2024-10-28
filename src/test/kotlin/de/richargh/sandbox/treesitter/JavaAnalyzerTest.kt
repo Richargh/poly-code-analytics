@@ -48,4 +48,30 @@ class JavaAnalyzerTest {
 //        testee.printTree(javaCode)
     }
 
+
+
+    @Test
+    fun shouldFindSiblingClasses() {
+        // given
+        val javaCode = """
+            package de.richargh.app.polycodeanalytics.sample;
+            
+            public class MyClass {
+                
+            }
+            
+            class Second { }
+            
+            class Third {}
+        """
+        val testee = JavaAnalyzer()
+        // when
+        val result = testee.analyze(javaCode)
+
+        // then
+        expectThat(result.allClasses().map { it.identifier }).containsExactly("MyClass", "Second", "Third")
+//        println(result.format(0))
+//        testee.printTree(javaCode)
+    }
+
 }
