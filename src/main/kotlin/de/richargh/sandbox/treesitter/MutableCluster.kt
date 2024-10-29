@@ -108,7 +108,7 @@ abstract class BaseCluster(override val previous: MutableCluster?, override val 
 }
 
 interface ClusterBuilder {
-    fun buildPackageCluster(identifier: String): PackageCluster
+    fun buildPackageCluster(identifiers: List<String>): PackageCluster
     fun buildClassCluster(modifier: String, identifier: String): ClassCluster
     fun buildRecordCluster(modifier: String, identifier: String, formalParameters: String): RecordCluster
     fun buildFunctionCluster(
@@ -120,8 +120,8 @@ interface ClusterBuilder {
 }
 
 class BaseClusterBuilder(private val previous: MutableCluster, private val codeLines: List<String>) : ClusterBuilder {
-    override fun buildPackageCluster(identifier: String) = PackageCluster(
-        identifier, previous, codeLines
+    override fun buildPackageCluster(identifiers: List<String>) = PackageCluster(
+        identifiers, previous, codeLines
     )
 
     override fun buildClassCluster(modifier: String, identifier: String) = ClassCluster(
@@ -147,11 +147,11 @@ class FileCluster(codeLines: List<String>) : BaseCluster(null, codeLines) {
 }
 
 class PackageCluster(
-    val identifier: String, previous: MutableCluster, codeLines: List<String>
+    val identifiers: List<String>, previous: MutableCluster, codeLines: List<String>
 ) : BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
-            appendLine("package $identifier")
+            appendLine("package $identifiers")
         }
     }
 }

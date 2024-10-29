@@ -31,7 +31,7 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allPackages()).map { it.identifier }.containsExactly("de.richargh.sample")
+            expectThat(result.allPackages()).map { it.identifiers.joinToString(".") }.containsExactly("de.richargh.sample")
         }
 
         @Test

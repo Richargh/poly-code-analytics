@@ -52,16 +52,22 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
 }
 
 private fun handlePackageDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
-    var identifier = "none"
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
-        when (currentNode.type) {
-            "identifier" -> identifier = contents(currentNode, cluster.codeLines)
-            "scoped_identifier" -> identifier = contents(currentNode, cluster.codeLines) // TODO
-        }
-    }
+    var identifier = handleIdentifier(node, cluster)
 
     return cluster.addCluster(cluster.builder().buildPackageCluster(identifier))
+}
+
+private fun handleIdentifier(node: TSNode, cluster: MutableCluster): List<String> {
+    var identifiers = mutableListOf<String>()
+    if (node.type == "identifier") {
+        identifiers = mutableListOf(contents(node, cluster.codeLines))
+    }
+
+    (0 until node.childCount).forEach { index ->
+        identifiers += handleIdentifier(node.getChild(index), cluster)
+    }
+
+    return identifiers
 }
 
 private fun handleClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {
@@ -119,7 +125,7 @@ private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
                 variableDeclaratorIndex = index
                 (0 until currentNode.childCount).forEach { index ->
                     val subNode = currentNode.getChild(index)
-                    when(subNode.type){
+                    when (subNode.type) {
                         "identifier" -> identifier = contents(subNode, cluster.codeLines)
                     }
                 }
