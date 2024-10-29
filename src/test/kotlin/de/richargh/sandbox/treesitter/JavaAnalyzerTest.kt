@@ -60,6 +60,30 @@ class JavaAnalyzerTest {
     inner class Imports {
 
         @Test
+        fun shouldFindFullImport() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            import java.util.List;
+            
+            public class MyClass {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }.containsExactly("java.util.List")
+        }
+
+        @Test
         fun shouldFindStarImport() {
             // given
             val javaCode = """
@@ -80,9 +104,56 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allImports()).containsExactly(Import("import java.util.*;"))
+            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }.containsExactly("java.util.*")
         }
 
+        @Test
+        fun shouldFindStaticFullImport() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            import static java.util.List.of;
+            
+            public class MyClass {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }.containsExactly("java.util.List.of")
+        }
+
+        @Test
+        fun shouldFindStaticStarImport() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            import static java.util.List.*;
+            
+            public class MyClass {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }.containsExactly("java.util.List.*")
+        }
     }
 
     @Nested

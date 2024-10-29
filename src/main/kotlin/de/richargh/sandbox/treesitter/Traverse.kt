@@ -58,17 +58,18 @@ private fun handlePackageDeclaration(node: TSNode, cluster: MutableCluster): Mut
 }
 
 private fun handleImportDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
-    val importPath = contents(node, cluster.codeLines)
+    val identifiers = handleIdentifier(node, cluster)
 
-    cluster.addImport(listOf(importPath))
+    cluster.addImport(identifiers)
 
     return cluster
 }
 
 private fun handleIdentifier(node: TSNode, cluster: MutableCluster): List<String> {
     var identifiers = mutableListOf<String>()
-    if (node.type == "identifier") {
-        identifiers = mutableListOf(contents(node, cluster.codeLines))
+    when (node.type) {
+        "identifier", "asterisk" ->
+            identifiers = mutableListOf(contents(node, cluster.codeLines))
     }
 
     (0 until node.childCount).forEach { index ->
