@@ -26,6 +26,6 @@ class JavaAnalyzer {
     fun printTree(javaCode: String){
         val tree = parser.parseString(null, javaCode)
         val rootNode = tree.rootNode
-        printNode(rootNode, "")
+        println(formatNode(rootNode, ""))
     }
 }

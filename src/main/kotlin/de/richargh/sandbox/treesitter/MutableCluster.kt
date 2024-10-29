@@ -1,7 +1,5 @@
 package de.richargh.sandbox.treesitter
 
-import org.treesitter.TSNode
-
 interface MutableCluster : Cluster {
     val previous: MutableCluster?
     fun addCluster(cluster: MutableCluster): MutableCluster
@@ -187,5 +185,31 @@ class FunctionCluster(
         return buildString {
             appendLine("$modifiers $identifier $parameters: $returnType")
         }
+    }
+}
+
+class TypeIdentifierBuilder {
+    private var type = ""
+    private val typeParameters = mutableListOf<String>()
+
+    fun build() = if (typeParameters.isEmpty())
+        ConcreteTypeIdentifier(type)
+    else
+        GenericTypeIdentifier(type, typeParameters)
+
+    fun addType(type: String) {
+        this.type = type
+    }
+
+    fun addTypeParameter(typeParameter: String) {
+        this.typeParameters.add(typeParameter)
+    }
+
+    operator fun plus(other: TypeIdentifierBuilder): TypeIdentifierBuilder {
+        if(this.type.isEmpty())
+            this.type = other.type
+        this.typeParameters += other.typeParameters
+
+        return this
     }
 }

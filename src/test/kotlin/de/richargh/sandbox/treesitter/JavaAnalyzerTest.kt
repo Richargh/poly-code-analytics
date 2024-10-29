@@ -31,7 +31,8 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allPackages()).map { it.identifiers.joinToString(".") }.containsExactly("de.richargh.sample")
+            expectThat(result.allPackages()).map { it.identifiers.joinToString(".") }
+                .containsExactly("de.richargh.sample")
         }
 
         @Test
@@ -128,7 +129,8 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }.containsExactly("java.util.List.of")
+            expectThat(result.allImports()).map { it.identifiers.joinToString(".") }
+                .containsExactly("java.util.List.of")
         }
 
         @Test
@@ -253,7 +255,13 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
+            expectThat(result.allFields()).containsExactly(
+                Field(
+                    "private final",
+                    "myField",
+                    ConcreteTypeIdentifier("String")
+                )
+            )
         }
 
         @Test
@@ -278,7 +286,13 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allFields()).containsExactly(Field("private final", "myField", "String"))
+            expectThat(result.allFields()).containsExactly(
+                Field(
+                    "private final",
+                    "myField",
+                    ConcreteTypeIdentifier("String")
+                )
+            )
         }
     }
 
@@ -510,7 +524,7 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation(ConcreteTypeIdentifier("Other"), "()"))
         }
     }
 
@@ -627,7 +641,7 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation(ConcreteTypeIdentifier("Other"), "()"))
         }
     }
 
@@ -796,7 +810,39 @@ class JavaAnalyzerTest {
                 println(result.format(0))
                 testee.printTree(javaCode)
             }
-            expectThat(result.allInvocations()).containsExactly(ObjectCreation("Other", "()"))
+            expectThat(result.allInvocations()).containsExactly(ObjectCreation(ConcreteTypeIdentifier("Other"), "()"))
+        }
+
+        @Test
+        fun shouldFindFunctionGenericConstructorInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public record MyRecord() {
+                
+                void doSth(){
+                    var map = new ConcurrentHashMap<Int, String>();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(
+                ObjectCreation(
+                    GenericTypeIdentifier(
+                        "ConcurrentHashMap",
+                        listOf("Int", "String")
+                    ), "()"
+                )
+            )
         }
     }
 

@@ -17,7 +17,7 @@ data class Import(val identifiers: List<String>){
     constructor(vararg identifiers: String) : this(identifiers.toList())
 }
 
-data class Field(val modifier: String, val identifier: String, val typeIdentifier: String)
+data class Field(val modifier: String, val identifier: String, val typeIdentifier: TypeIdentifier)
 
 interface Invocation
 
@@ -26,5 +26,11 @@ data class FunctionInvocation(
 ) : Invocation
 
 data class ObjectCreation(
-    val typeIdentifier: String, val arguments: String
+    val typeIdentifier: TypeIdentifier, val arguments: String
 ) : Invocation
+
+interface TypeIdentifier
+
+data class ConcreteTypeIdentifier(val type: String) : TypeIdentifier
+
+data class GenericTypeIdentifier(val type: String, val typeParameters: List<String>) : TypeIdentifier

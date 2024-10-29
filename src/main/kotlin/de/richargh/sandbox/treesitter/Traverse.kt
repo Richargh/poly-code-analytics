@@ -122,14 +122,15 @@ private fun handleRecordDeclaration(node: TSNode, cluster: MutableCluster): Pair
 private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
     var variableDeclaratorIndex = 0
     var modifier = "default"
-    var typeIdentifier = "none"
+    var typeIdentifier: TypeIdentifier? = null
     var identifier = "none"
     (0 until node.childCount).forEach { index ->
         val currentNode = node.getChild(index)
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
-            "type_identifier" -> typeIdentifier = contents(currentNode, cluster.codeLines)
-            "generic_type" -> typeIdentifier = contents(currentNode, cluster.codeLines)
+            "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
+                handleTypeIdentifier(currentNode, cluster, false).build()
+
             "variable_declarator" -> {
                 variableDeclaratorIndex = index
                 (0 until currentNode.childCount).forEach { index ->
@@ -142,7 +143,8 @@ private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
             }
         }
     }
-    cluster.addField(Field(modifier, identifier, typeIdentifier))
+    assertTypeIdentifier(typeIdentifier, node, cluster)
+    cluster.addField(Field(modifier, identifier, typeIdentifier!!))
 
     return variableDeclaratorIndex
 }
@@ -164,17 +166,65 @@ private fun handleMethodInvocation(node: TSNode, cluster: MutableCluster) {
 }
 
 private fun handleObjectCreationExpression(node: TSNode, cluster: MutableCluster) {
-    var typeIdentifier = ""
+    var typeIdentifier: TypeIdentifier? = null
     var argumentList = ""
     (0 until node.childCount).forEach { index ->
         val currentNode = node.getChild(index)
         when (currentNode.type) {
-            "type_identifier" -> typeIdentifier = contents(currentNode, cluster.codeLines)
+            "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
+                handleTypeIdentifier(currentNode, cluster, false).build()
+
             "argument_list" -> argumentList = contents(currentNode, cluster.codeLines)
         }
     }
 
-    cluster.addObjectCreation(ObjectCreation(typeIdentifier, argumentList))
+    cluster.addObjectCreation(ObjectCreation(typeIdentifier!!, argumentList))
+}
+
+private fun handleTypeIdentifier(
+    node: TSNode,
+    cluster: MutableCluster,
+    isTypeArgument: Boolean
+): TypeIdentifierBuilder {
+    // TODO can't do nested type parameters
+    var typeIdentifier = TypeIdentifierBuilder()
+    var isNextTypeArgument = isTypeArgument
+    when (node.type) {
+        "generic_type" -> { /* noop */
+        }
+
+        "integral_type" -> {
+            typeIdentifier.addType(contents(node, cluster.codeLines))
+        }
+
+        "type_identifier" -> {
+            if (isTypeArgument)
+                typeIdentifier.addTypeParameter(contents(node, cluster.codeLines))
+            else
+                typeIdentifier.addType(contents(node, cluster.codeLines))
+        }
+
+        "type_arguments" -> isNextTypeArgument = true
+        "<" -> { /* noop */
+        }
+
+        ">" -> { /* noop */
+        }
+    }
+
+    (0 until node.childCount).forEach { index ->
+        typeIdentifier += handleTypeIdentifier(node.getChild(index), cluster, isNextTypeArgument)
+    }
+
+    return typeIdentifier
+}
+
+private fun assertTypeIdentifier(typeIdentifier: TypeIdentifier?, node: TSNode, cluster: MutableCluster) {
+    if (typeIdentifier == null)
+        throw IllegalArgumentException(
+            "Type identifier should not be null for ${contents(node, cluster.codeLines)}\n" +
+                    formatNode(node, "")
+        )
 }
 
 private fun handleMethodDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {

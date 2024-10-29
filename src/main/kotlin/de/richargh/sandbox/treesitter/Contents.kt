@@ -20,10 +20,13 @@ fun contents(node: TSNode, codeLines: List<String>): String {
     }
 }
 
-fun printNode(node: TSNode, indent: String) {
-    println("$indent${node.type} [${node.startPoint.row}, ${node.startPoint.column}] - [${node.endPoint.row}, ${node.endPoint.column}]")
+fun formatNode(node: TSNode, indent: String): String {
+    var stringBuilder = StringBuilder()
+    stringBuilder.appendLine("$indent${node.type} [${node.startPoint.row}, ${node.startPoint.column}] - [${node.endPoint.row}, ${node.endPoint.column}]")
 
-    (0 until node.childCount).forEach { index ->
-        printNode(node.getChild(index), "  $indent")
+    for (index in 0 until node.childCount) {
+        stringBuilder.append(formatNode(node.getChild(index), "  $indent"))
     }
+
+    return stringBuilder.toString()
 }
