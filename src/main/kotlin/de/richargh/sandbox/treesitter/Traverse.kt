@@ -52,7 +52,7 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
 }
 
 private fun parsePackageDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
-    var identifier = parseIdentifier(node, cluster)
+    val identifier = parseIdentifier(node, cluster)
 
     return cluster.addCluster(cluster.builder().buildPackageCluster(identifier))
 }
@@ -83,8 +83,7 @@ private fun parseClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<M
     var bodyIndex = 0
     var modifier = "default"
     var identifier = "none"
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChildIndexed { currentNode, index ->
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
             "identifier" -> identifier = contents(currentNode, cluster.codeLines)
@@ -103,8 +102,7 @@ private fun parseRecordDeclaration(node: TSNode, cluster: MutableCluster): Pair<
     var modifier = "default"
     var identifier = "none"
     var formalParameters = ""
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChildIndexed { currentNode, index ->
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
             "identifier" -> identifier = contents(currentNode, cluster.codeLines)
@@ -124,8 +122,7 @@ private fun parseFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
     var modifier = "default"
     var typeIdentifier: TypeIdentifier? = null
     var identifier = "none"
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChildIndexed { currentNode, index ->
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
@@ -133,8 +130,7 @@ private fun parseFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
 
             "variable_declarator" -> {
                 variableDeclaratorIndex = index
-                (0 until currentNode.childCount).forEach { index ->
-                    val subNode = currentNode.getChild(index)
+                currentNode.forEachChild { subNode ->
                     when (subNode.type) {
                         "identifier" -> identifier = contents(subNode, cluster.codeLines)
                     }
@@ -151,10 +147,9 @@ private fun parseFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
 
 private fun parseMethodInvocation(node: TSNode, cluster: MutableCluster) {
     var fieldAccess = ""
-    var identifiers = mutableListOf<String>()
+    val identifiers = mutableListOf<String>()
     var argumentList = ""
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChild { currentNode ->
         when (currentNode.type) {
             "field_access" -> fieldAccess = contents(currentNode, cluster.codeLines)
             "identifier" -> identifiers += contents(currentNode, cluster.codeLines)
@@ -168,8 +163,7 @@ private fun parseMethodInvocation(node: TSNode, cluster: MutableCluster) {
 private fun parseObjectCreationExpression(node: TSNode, cluster: MutableCluster) {
     var typeIdentifier: TypeIdentifier? = null
     var argumentList = ""
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChild { currentNode ->
         when (currentNode.type) {
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
                 parseTypeIdentifier(currentNode, cluster)
@@ -220,6 +214,13 @@ inline fun TSNode.forEachChild(action: (child: TSNode) -> Unit) {
     }
 }
 
+inline fun TSNode.forEachChildIndexed(action: (child: TSNode, index: Int) -> Unit) {
+    (0 until this.childCount).forEach { index ->
+        val child = this.getChild(index)
+        action(child, index)
+    }
+}
+
 private fun assertTypeIdentifier(typeIdentifier: TypeIdentifier?, node: TSNode, cluster: MutableCluster) {
     if (typeIdentifier == null)
         throw IllegalArgumentException(
@@ -233,8 +234,7 @@ private fun parseMethodDeclaration(node: TSNode, cluster: MutableCluster): Mutab
     var returnType = ""
     var identifier = ""
     var parameters = ""
-    (0 until node.childCount).forEach { index ->
-        val currentNode = node.getChild(index)
+    node.forEachChild { currentNode ->
         when (currentNode.type) {
             "modifiers" -> modifiers = contents(currentNode, cluster.codeLines)
             "void_type" -> returnType = contents(currentNode, cluster.codeLines)
