@@ -408,9 +408,8 @@ class JavaAnalyzerTest {
 
     }
 
-
     @Nested
-    inner class FindClassFieldInvocations {
+    inner class FindClassFieldInitializations {
 
         @Test
         fun shouldFindFieldStaticListInvocation() {
