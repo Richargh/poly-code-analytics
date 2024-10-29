@@ -13,7 +13,9 @@ interface Cluster {
     fun allInvocations(): List<Invocation>
 }
 
-data class Import(val path: String)
+data class Import(val identifiers: List<String>){
+    constructor(vararg identifiers: String) : this(identifiers.toList())
+}
 
 data class Field(val modifier: String, val identifier: String, val typeIdentifier: String)
 

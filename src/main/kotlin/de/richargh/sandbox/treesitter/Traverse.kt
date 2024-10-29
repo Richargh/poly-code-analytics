@@ -12,7 +12,7 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
         }
 
         "import_declaration" -> {
-            currentCluster.addImport(node)
+            handleImportDeclaration(node, cluster)
             childrenToExplore = IntRange.EMPTY
         }
 
@@ -55,6 +55,14 @@ private fun handlePackageDeclaration(node: TSNode, cluster: MutableCluster): Mut
     var identifier = handleIdentifier(node, cluster)
 
     return cluster.addCluster(cluster.builder().buildPackageCluster(identifier))
+}
+
+private fun handleImportDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
+    val importPath = contents(node, cluster.codeLines)
+
+    cluster.addImport(listOf(importPath))
+
+    return cluster
 }
 
 private fun handleIdentifier(node: TSNode, cluster: MutableCluster): List<String> {

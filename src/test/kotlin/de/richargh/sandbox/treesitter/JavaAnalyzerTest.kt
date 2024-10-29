@@ -60,7 +60,7 @@ class JavaAnalyzerTest {
     inner class Imports {
 
         @Test
-        fun shouldFindImport() {
+        fun shouldFindStarImport() {
             // given
             val javaCode = """
             package sample;

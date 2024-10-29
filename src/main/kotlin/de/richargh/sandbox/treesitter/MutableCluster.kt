@@ -5,7 +5,7 @@ import org.treesitter.TSNode
 interface MutableCluster : Cluster {
     val previous: MutableCluster?
     fun addCluster(cluster: MutableCluster): MutableCluster
-    fun addImport(node: TSNode)
+    fun addImport(identifiers: List<String>)
     fun addField(field: Field)
     fun addFunctionInvocation(functionInvocation: FunctionInvocation)
     fun addObjectCreation(objectCreation: ObjectCreation)
@@ -53,9 +53,8 @@ abstract class BaseCluster(override val previous: MutableCluster?, override val 
         return cluster
     }
 
-    override fun addImport(node: TSNode) {
-        val importPath = contents(node, codeLines)
-        imports.add(Import(importPath))
+    override fun addImport(identifiers: List<String>) {
+        imports.add(Import(identifiers))
     }
 
     override fun addField(field: Field) {
