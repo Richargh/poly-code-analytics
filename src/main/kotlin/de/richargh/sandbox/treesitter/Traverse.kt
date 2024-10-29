@@ -7,42 +7,42 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
     var currentCluster = cluster
     when (node.type) {
         "package_declaration" -> {
-            currentCluster = handlePackageDeclaration(node, cluster)
+            currentCluster = parsePackageDeclaration(node, cluster)
             childrenToExplore = IntRange.EMPTY
         }
 
         "import_declaration" -> {
-            handleImportDeclaration(node, cluster)
+            parseImportDeclaration(node, cluster)
             childrenToExplore = IntRange.EMPTY
         }
 
         "class_declaration" -> {
-            val (nextCluster, classBodyIndex) = handleClassDeclaration(node, cluster)
+            val (nextCluster, classBodyIndex) = parseClassDeclaration(node, cluster)
             currentCluster = nextCluster
             childrenToExplore = classBodyIndex until node.childCount
         }
 
         "record_declaration" -> {
-            val (nextCluster, classBodyIndex) = handleRecordDeclaration(node, cluster)
+            val (nextCluster, classBodyIndex) = parseRecordDeclaration(node, cluster)
             currentCluster = nextCluster
             childrenToExplore = classBodyIndex until node.childCount
         }
 
         "field_declaration" -> {
-            val variableDeclaratorIndex = handleFieldDeclaration(node, cluster)
+            val variableDeclaratorIndex = parseFieldDeclaration(node, cluster)
             childrenToExplore = variableDeclaratorIndex until node.childCount
         }
 
         "method_declaration" -> {
-            handleMethodDeclaration(node, cluster)
+            parseMethodDeclaration(node, cluster)
         }
 
         "method_invocation" -> {
-            handleMethodInvocation(node, cluster)
+            parseMethodInvocation(node, cluster)
         }
 
         "object_creation_expression" -> {
-            handleObjectCreationExpression(node, cluster)
+            parseObjectCreationExpression(node, cluster)
         }
     }
 
@@ -51,21 +51,21 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
     }
 }
 
-private fun handlePackageDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
-    var identifier = handleIdentifier(node, cluster)
+private fun parsePackageDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
+    var identifier = parseIdentifier(node, cluster)
 
     return cluster.addCluster(cluster.builder().buildPackageCluster(identifier))
 }
 
-private fun handleImportDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
-    val identifiers = handleIdentifier(node, cluster)
+private fun parseImportDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
+    val identifiers = parseIdentifier(node, cluster)
 
     cluster.addImport(identifiers)
 
     return cluster
 }
 
-private fun handleIdentifier(node: TSNode, cluster: MutableCluster): List<String> {
+private fun parseIdentifier(node: TSNode, cluster: MutableCluster): List<String> {
     var identifiers = mutableListOf<String>()
     when (node.type) {
         "identifier", "asterisk" ->
@@ -73,13 +73,13 @@ private fun handleIdentifier(node: TSNode, cluster: MutableCluster): List<String
     }
 
     (0 until node.childCount).forEach { index ->
-        identifiers += handleIdentifier(node.getChild(index), cluster)
+        identifiers += parseIdentifier(node.getChild(index), cluster)
     }
 
     return identifiers
 }
 
-private fun handleClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {
+private fun parseClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {
     var bodyIndex = 0
     var modifier = "default"
     var identifier = "none"
@@ -98,7 +98,7 @@ private fun handleClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<
     )
 }
 
-private fun handleRecordDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {
+private fun parseRecordDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {
     var bodyIndex = 0
     var modifier = "default"
     var identifier = "none"
@@ -119,7 +119,7 @@ private fun handleRecordDeclaration(node: TSNode, cluster: MutableCluster): Pair
     )
 }
 
-private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
+private fun parseFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
     var variableDeclaratorIndex = 0
     var modifier = "default"
     var typeIdentifier: TypeIdentifier? = null
@@ -129,7 +129,7 @@ private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
-                handleTypeIdentifier(currentNode, cluster)
+                parseTypeIdentifier(currentNode, cluster)
 
             "variable_declarator" -> {
                 variableDeclaratorIndex = index
@@ -149,7 +149,7 @@ private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
     return variableDeclaratorIndex
 }
 
-private fun handleMethodInvocation(node: TSNode, cluster: MutableCluster) {
+private fun parseMethodInvocation(node: TSNode, cluster: MutableCluster) {
     var fieldAccess = ""
     var identifiers = mutableListOf<String>()
     var argumentList = ""
@@ -165,14 +165,14 @@ private fun handleMethodInvocation(node: TSNode, cluster: MutableCluster) {
     cluster.addFunctionInvocation(FunctionInvocation(fieldAccess, identifiers, argumentList))
 }
 
-private fun handleObjectCreationExpression(node: TSNode, cluster: MutableCluster) {
+private fun parseObjectCreationExpression(node: TSNode, cluster: MutableCluster) {
     var typeIdentifier: TypeIdentifier? = null
     var argumentList = ""
     (0 until node.childCount).forEach { index ->
         val currentNode = node.getChild(index)
         when (currentNode.type) {
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
-                handleTypeIdentifier(currentNode, cluster)
+                parseTypeIdentifier(currentNode, cluster)
 
             "argument_list" -> argumentList = contents(currentNode, cluster.codeLines)
         }
@@ -181,19 +181,19 @@ private fun handleObjectCreationExpression(node: TSNode, cluster: MutableCluster
     cluster.addObjectCreation(ObjectCreation(typeIdentifier!!, argumentList))
 }
 
-private fun handleTypeIdentifier(
+private fun parseTypeIdentifier(
     node: TSNode,
     cluster: MutableCluster,
 ): TypeIdentifier {
     when (node.type) {
-        "generic_type" -> return handleGenericType(node, cluster)
+        "generic_type" -> return parseGenericType(node, cluster)
         "integral_type" -> return ConcreteTypeIdentifier(contents(node, cluster.codeLines))
         "type_identifier" -> return ConcreteTypeIdentifier(contents(node, cluster.codeLines))
         else -> throw IllegalArgumentException("[${node.type}] is unexpected and unknown as a type identifier")
     }
 }
 
-private fun handleGenericType(
+private fun parseGenericType(
     genericNode: TSNode,
     cluster: MutableCluster,
 ): TypeIdentifier {
@@ -204,7 +204,7 @@ private fun handleGenericType(
             "type_arguments" -> {
                 child.forEachChild { subChild ->
                     if(subChild.type !in setOf("<", ">", ","))
-                        builder.addTypeParameter(handleTypeIdentifier(subChild, cluster))
+                        builder.addTypeParameter(parseTypeIdentifier(subChild, cluster))
                 }
             }
         }
@@ -228,7 +228,7 @@ private fun assertTypeIdentifier(typeIdentifier: TypeIdentifier?, node: TSNode, 
         )
 }
 
-private fun handleMethodDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
+private fun parseMethodDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
     var modifiers = ""
     var returnType = ""
     var identifier = ""
