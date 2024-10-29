@@ -7,7 +7,54 @@ import strikt.assertions.*
 
 class JavaAnalyzerTest {
 
-    private val debugTree = false
+    private val debugTree = true
+
+    @Nested
+    inner class Packages {
+
+        @Test
+        fun shouldFindPackage() {
+            // given
+            val javaCode = """
+            package de.richargh.sample;
+            
+            public class MyClass {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allPackages()).map { it.identifier }.containsExactly("de.richargh.sample")
+        }
+
+        @Test
+        fun shouldNotFindMissingPackage() {
+            // given
+            val javaCode = """
+            public class MyClass {
+                
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allPackages()).isEmpty()
+        }
+
+    }
 
     @Nested
     inner class Imports {

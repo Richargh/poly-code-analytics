@@ -6,6 +6,11 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
     var childrenToExplore = 0 until node.childCount
     var currentCluster = cluster
     when (node.type) {
+        "package_declaration" -> {
+            currentCluster = handlePackageDeclaration(node, cluster)
+            childrenToExplore = IntRange.EMPTY
+        }
+
         "import_declaration" -> {
             currentCluster.addImport(node)
             childrenToExplore = IntRange.EMPTY
@@ -44,6 +49,19 @@ fun traverseNode(node: TSNode, cluster: MutableCluster) {
     childrenToExplore.forEach { index ->
         traverseNode(node.getChild(index), currentCluster)
     }
+}
+
+private fun handlePackageDeclaration(node: TSNode, cluster: MutableCluster): MutableCluster {
+    var identifier = "none"
+    (0 until node.childCount).forEach { index ->
+        val currentNode = node.getChild(index)
+        when (currentNode.type) {
+            "identifier" -> identifier = contents(currentNode, cluster.codeLines)
+            "scoped_identifier" -> identifier = contents(currentNode, cluster.codeLines) // TODO
+        }
+    }
+
+    return cluster.addCluster(cluster.builder().buildPackageCluster(identifier))
 }
 
 private fun handleClassDeclaration(node: TSNode, cluster: MutableCluster): Pair<MutableCluster, Int> {

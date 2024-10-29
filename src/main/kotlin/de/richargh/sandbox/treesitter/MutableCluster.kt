@@ -13,7 +13,8 @@ interface MutableCluster : Cluster {
     fun builder(): ClusterBuilder
 }
 
-abstract class BaseCluster(override val previous: MutableCluster?, override val codeLines: List<String>) : MutableCluster {
+abstract class BaseCluster(override val previous: MutableCluster?, override val codeLines: List<String>) :
+    MutableCluster {
     private val children: MutableList<MutableCluster> = mutableListOf()
     private val imports: MutableList<Import> = mutableListOf()
     private val fields: MutableList<Field> = mutableListOf()
@@ -41,6 +42,10 @@ abstract class BaseCluster(override val previous: MutableCluster?, override val 
 
     override fun allInvocations(): List<Invocation> {
         return invocations + children.flatMap { it.allInvocations() }
+    }
+
+    override fun allPackages(): List<PackageCluster> {
+        return children.filterIsInstance<PackageCluster>() + children.flatMap { it.allPackages() }
     }
 
     override fun addCluster(cluster: MutableCluster): MutableCluster {
@@ -103,15 +108,20 @@ abstract class BaseCluster(override val previous: MutableCluster?, override val 
 }
 
 interface ClusterBuilder {
-    fun buildPackageCluster(): PackageCluster
+    fun buildPackageCluster(identifier: String): PackageCluster
     fun buildClassCluster(modifier: String, identifier: String): ClassCluster
     fun buildRecordCluster(modifier: String, identifier: String, formalParameters: String): RecordCluster
-    fun buildFunctionCluster(modifiers: String, identifier: String, parameters: String, returnType: String): FunctionCluster
+    fun buildFunctionCluster(
+        modifiers: String,
+        identifier: String,
+        parameters: String,
+        returnType: String
+    ): FunctionCluster
 }
 
 class BaseClusterBuilder(private val previous: MutableCluster, private val codeLines: List<String>) : ClusterBuilder {
-    override fun buildPackageCluster() = PackageCluster(
-        previous, codeLines
+    override fun buildPackageCluster(identifier: String) = PackageCluster(
+        identifier, previous, codeLines
     )
 
     override fun buildClassCluster(modifier: String, identifier: String) = ClassCluster(
@@ -136,10 +146,12 @@ class FileCluster(codeLines: List<String>) : BaseCluster(null, codeLines) {
     }
 }
 
-class PackageCluster(previous: MutableCluster, codeLines: List<String>) : BaseCluster(previous, codeLines) {
+class PackageCluster(
+    val identifier: String, previous: MutableCluster, codeLines: List<String>
+) : BaseCluster(previous, codeLines) {
     override fun formatHeader(): String {
         return buildString {
-            appendLine("Package")
+            appendLine("package $identifier")
         }
     }
 }

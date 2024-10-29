@@ -4,6 +4,7 @@ interface Cluster {
     val codeLines: List<String>
     fun format(indent: Int): String
 
+    fun allPackages(): List<PackageCluster>
     fun allImports(): List<Import>
     fun allClasses(): List<ClassCluster>
     fun allRecords(): List<RecordCluster>
