@@ -1,5 +1,7 @@
 package de.richargh.sandbox.treesitter
 
+import com.sun.jdi.Type
+
 interface Cluster {
     val codeLines: List<String>
     fun format(indent: Int): String
@@ -27,10 +29,20 @@ data class FunctionInvocation(
 
 data class ObjectCreation(
     val typeIdentifier: TypeIdentifier, val arguments: String
-) : Invocation
+) : Invocation {
+    override fun toString() = "new $typeIdentifier$arguments"
+}
 
 interface TypeIdentifier
 
-data class ConcreteTypeIdentifier(val type: String) : TypeIdentifier
+data class ConcreteTypeIdentifier(val type: String) : TypeIdentifier {
+    override fun toString(): String = type
+}
 
-data class GenericTypeIdentifier(val type: String, val typeParameters: List<String>) : TypeIdentifier
+data class GenericTypeIdentifier(val type: String, val typeParameters: List<TypeIdentifier>) : TypeIdentifier {
+    constructor(type: String, vararg typeParameters: TypeIdentifier) : this(type, typeParameters.toList())
+
+    override fun toString() = "$type<${typeParameters.joinToString(", ")}>"
+}
+
+

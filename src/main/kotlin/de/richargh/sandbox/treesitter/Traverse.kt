@@ -129,7 +129,7 @@ private fun handleFieldDeclaration(node: TSNode, cluster: MutableCluster): Int {
         when (currentNode.type) {
             "modifiers" -> modifier = contents(currentNode, cluster.codeLines)
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
-                handleTypeIdentifier(currentNode, cluster, false).build()
+                handleTypeIdentifier(currentNode, cluster)
 
             "variable_declarator" -> {
                 variableDeclaratorIndex = index
@@ -172,7 +172,7 @@ private fun handleObjectCreationExpression(node: TSNode, cluster: MutableCluster
         val currentNode = node.getChild(index)
         when (currentNode.type) {
             "type_identifier", "generic_type", "integral_type" -> typeIdentifier =
-                handleTypeIdentifier(currentNode, cluster, false).build()
+                handleTypeIdentifier(currentNode, cluster)
 
             "argument_list" -> argumentList = contents(currentNode, cluster.codeLines)
         }
@@ -184,39 +184,40 @@ private fun handleObjectCreationExpression(node: TSNode, cluster: MutableCluster
 private fun handleTypeIdentifier(
     node: TSNode,
     cluster: MutableCluster,
-    isTypeArgument: Boolean
-): TypeIdentifierBuilder {
-    // TODO can't do nested type parameters
-    var typeIdentifier = TypeIdentifierBuilder()
-    var isNextTypeArgument = isTypeArgument
+): TypeIdentifier {
     when (node.type) {
-        "generic_type" -> { /* noop */
-        }
+        "generic_type" -> return handleGenericType(node, cluster)
+        "integral_type" -> return ConcreteTypeIdentifier(contents(node, cluster.codeLines))
+        "type_identifier" -> return ConcreteTypeIdentifier(contents(node, cluster.codeLines))
+        else -> throw IllegalArgumentException("[${node.type}] is unexpected and unknown as a type identifier")
+    }
+}
 
-        "integral_type" -> {
-            typeIdentifier.addType(contents(node, cluster.codeLines))
-        }
-
-        "type_identifier" -> {
-            if (isTypeArgument)
-                typeIdentifier.addTypeParameter(contents(node, cluster.codeLines))
-            else
-                typeIdentifier.addType(contents(node, cluster.codeLines))
-        }
-
-        "type_arguments" -> isNextTypeArgument = true
-        "<" -> { /* noop */
-        }
-
-        ">" -> { /* noop */
+private fun handleGenericType(
+    genericNode: TSNode,
+    cluster: MutableCluster,
+): TypeIdentifier {
+    val builder = GenericTypeIdentifierBuilder()
+    genericNode.forEachChild { child ->
+        when (child.type) {
+            "type_identifier" -> builder.addBaseType(contents(child, cluster.codeLines))
+            "type_arguments" -> {
+                child.forEachChild { subChild ->
+                    if(subChild.type !in setOf("<", ">", ","))
+                        builder.addTypeParameter(handleTypeIdentifier(subChild, cluster))
+                }
+            }
         }
     }
 
-    (0 until node.childCount).forEach { index ->
-        typeIdentifier += handleTypeIdentifier(node.getChild(index), cluster, isNextTypeArgument)
-    }
+    return builder.build()
+}
 
-    return typeIdentifier
+inline fun TSNode.forEachChild(action: (child: TSNode) -> Unit) {
+    (0 until this.childCount).forEach { index ->
+        val child = this.getChild(index)
+        action(child)
+    }
 }
 
 private fun assertTypeIdentifier(typeIdentifier: TypeIdentifier?, node: TSNode, cluster: MutableCluster) {

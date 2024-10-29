@@ -188,28 +188,17 @@ class FunctionCluster(
     }
 }
 
-class TypeIdentifierBuilder {
-    private var type = ""
-    private val typeParameters = mutableListOf<String>()
+class GenericTypeIdentifierBuilder {
+    private lateinit var baseType: String
+    private val typeParameters = mutableListOf<TypeIdentifier>()
 
-    fun build() = if (typeParameters.isEmpty())
-        ConcreteTypeIdentifier(type)
-    else
-        GenericTypeIdentifier(type, typeParameters)
-
-    fun addType(type: String) {
-        this.type = type
+    fun addBaseType(baseType: String) {
+        this.baseType = baseType
     }
 
-    fun addTypeParameter(typeParameter: String) {
+    fun addTypeParameter(typeParameter: TypeIdentifier) {
         this.typeParameters.add(typeParameter)
     }
 
-    operator fun plus(other: TypeIdentifierBuilder): TypeIdentifierBuilder {
-        if(this.type.isEmpty())
-            this.type = other.type
-        this.typeParameters += other.typeParameters
-
-        return this
-    }
+    fun build() = GenericTypeIdentifier(baseType, typeParameters)
 }

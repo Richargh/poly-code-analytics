@@ -467,6 +467,7 @@ class JavaAnalyzerTest {
         """
             val testee = JavaAnalyzer()
             // when
+            testee.printTree(javaCode)
             val result = testee.analyze(javaCode)
 
             // then
@@ -839,7 +840,41 @@ class JavaAnalyzerTest {
                 ObjectCreation(
                     GenericTypeIdentifier(
                         "ConcurrentHashMap",
-                        listOf("Int", "String")
+                        ConcreteTypeIdentifier("Int"),
+                        ConcreteTypeIdentifier("String")
+                    ), "()"
+                )
+            )
+        }
+
+        @Test
+        fun shouldFindFunctionNestedGenericConstructorInvocation() {
+            // given
+            val javaCode = """
+            package sample;
+            
+            public record MyRecord() {
+                
+                void doSth(){
+                    var map = new ConcurrentHashMap<Int, List<String>>();
+                }
+            }
+        """
+            val testee = JavaAnalyzer()
+            // when
+            val result = testee.analyze(javaCode)
+
+            // then
+            if (debugTree) {
+                println(result.format(0))
+                testee.printTree(javaCode)
+            }
+            expectThat(result.allInvocations()).containsExactly(
+                ObjectCreation(
+                    GenericTypeIdentifier(
+                        "ConcurrentHashMap",
+                        ConcreteTypeIdentifier("Int"),
+                        GenericTypeIdentifier("List", ConcreteTypeIdentifier("String")),
                     ), "()"
                 )
             )
